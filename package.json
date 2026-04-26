@@ -1,0 +1,29 @@
+{
+  "name": "project_10k",
+  "version": "1.0.0",
+  "description": "Project_10k lets your 10,000-hour journey transformed from a dark grind into a transparent, shared pursuit of excellence. It track reps, build momentum, till you achieve absolute mastery.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lucide-react": "^0.479.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^3.4.19",
+    "vite": "^6.2.0"
+  }
+}
