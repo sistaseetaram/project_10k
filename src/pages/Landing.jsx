@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 
+const base = import.meta.env.BASE_URL;
+
 export default function Landing({ onEnter }) {
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -62,11 +64,11 @@ export default function Landing({ onEnter }) {
           <video
             ref={videoRef}
             className="block aspect-video w-full bg-black"
-            poster="/hero-poster.jpg"
+            poster={`${base}hero-poster.jpg`}
             preload="metadata"
             controls={playing}
             playsInline
-            src="/hero.mp4"
+            src={`${base}hero.mp4`}
             onEnded={() => setPlaying(false)}
           />
           {!playing && (
