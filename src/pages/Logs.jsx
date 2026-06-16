@@ -22,8 +22,8 @@ const Logs = () => {
               {/* Activity Focus */}
               <div className="space-y-2 md:col-span-2">
                 <label className="block font-label text-sm font-semibold text-on-surface-variant text-slate-600" htmlFor="focus">Activity Focus</label>
-                <select className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary-container transition-all appearance-none cursor-pointer" id="focus">
-                  <option disabled defaultValue="" value="">Select primary activity area...</option>
+                <select className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary-container transition-all appearance-none cursor-pointer" id="focus" defaultValue="">
+                  <option disabled value="">Select primary activity area...</option>
                   <option value="coding">Software Development</option>
                   <option value="design">UI/UX Design</option>
                   <option value="writing">Technical Writing</option>

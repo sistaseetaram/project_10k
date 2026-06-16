@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ActivityDetail from './pages/ActivityDetail';
 import Logs from './pages/Logs';
@@ -10,6 +11,7 @@ import Settings from './pages/Settings';
 import Archive from './pages/Archive';
 
 function App() {
+  const [view, setView] = useState('landing');
   const [currentPage, setCurrentPage] = useState('dashboard');
 
   const renderPage = () => {
@@ -24,6 +26,10 @@ function App() {
       default: return <Dashboard />;
     }
   };
+
+  if (view === 'landing') {
+    return <Landing onEnter={() => setView('app')} />;
+  }
 
   return (
     <div className="flex h-screen bg-background font-body text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container">

@@ -94,9 +94,9 @@ const Settings = () => {
                 <span className="material-symbols-outlined text-[16px] text-primary" title="Time before penalty applies">info</span>
               </label>
               <div className="relative">
-                <select className="w-full bg-white border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow cursor-pointer font-medium border-slate-200">
+                <select className="w-full bg-white border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow cursor-pointer font-medium border-slate-200" defaultValue="48 Hours (Standard)">
                   <option>24 Hours (Aggressive)</option>
-                  <option defaultValue="">48 Hours (Standard)</option>
+                  <option>48 Hours (Standard)</option>
                   <option>72 Hours (Lenient)</option>
                 </select>
                 <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">unfold_more</span>
