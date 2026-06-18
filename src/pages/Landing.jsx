@@ -74,7 +74,7 @@ export default function Landing({ onEnter }) {
           {!playing && (
             <button
               onClick={play}
-              aria-label="Play the film, 27 seconds, sound on"
+              aria-label="Play the film, 16 seconds, sound on"
               className="absolute inset-0 grid place-items-center bg-gradient-to-t from-[#06110b]/70 via-[#06110b]/10 to-transparent"
             >
               <span className="grid h-20 w-20 place-items-center rounded-full bg-[#1ad17f] shadow-[0_0_50px_rgba(26,209,127,0.6)] transition duration-300 group-hover:scale-110">
@@ -83,7 +83,7 @@ export default function Landing({ onEnter }) {
                 </svg>
               </span>
               <span className="absolute bottom-5 text-sm font-medium text-[#cfeede]">
-                Watch the film · 0:27 · sound on
+                Watch the film · 0:16 · sound on
               </span>
             </button>
           )}
