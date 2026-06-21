@@ -1,6 +1,71 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useProfile } from '../hooks/useProfile';
+import { useAuth } from '../context/AuthContext';
+
+const GRACE_OPTIONS = [
+  { value: 24, label: '24 Hours (Aggressive)' },
+  { value: 48, label: '48 Hours (Standard)' },
+  { value: 72, label: '72 Hours (Lenient)' },
+];
 
 const Settings = () => {
+  const { profile, loading, updateProfile } = useProfile();
+  const { user } = useAuth();
+
+  const [displayName, setDisplayName] = useState('');
+  const [primaryFocus, setPrimaryFocus] = useState('');
+  const [weeklyTarget, setWeeklyTarget] = useState(20);
+  const [inactivityPenalty, setInactivityPenalty] = useState(true);
+  const [gracePeriod, setGracePeriod] = useState(48);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.display_name || '');
+      setPrimaryFocus(profile.primary_focus || '');
+      setWeeklyTarget(profile.weekly_target_hours ?? 20);
+      setInactivityPenalty(profile.inactivity_penalty ?? true);
+      setGracePeriod(profile.grace_period_hours ?? 48);
+    }
+  }, [profile]);
+
+  const save = async () => {
+    setSaving(true);
+    setError('');
+    setToast('');
+    try {
+      await updateProfile({
+        display_name: displayName.trim(),
+        primary_focus: primaryFocus.trim() || null,
+        weekly_target_hours: Number(weeklyTarget) || 0,
+        inactivity_penalty: inactivityPenalty,
+        grace_period_hours: Number(gracePeriod) || 0,
+      });
+      setToast('Settings saved.');
+    } catch (e) {
+      setError(e.message || 'Could not save settings.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-8 pb-10">
+        <div className="animate-pulse space-y-8">
+          <div className="h-16 rounded-xl bg-surface-container-high" />
+          <div className="h-24 rounded-xl bg-surface-container-high" />
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="h-96 rounded-[1.5rem] bg-surface-container-high" />
+            <div className="h-96 rounded-[1.5rem] bg-surface-container-high" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-10">
       {/* Page Header */}
@@ -31,7 +96,7 @@ const Settings = () => {
               <img
                 alt="Profile Avatar"
                 className="h-full w-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAubR8xt3BclBC3Z4GLCmxYyNxup3OrozKL-iqDeGoVSWOi6emkJ1ii1G8of_i8L4KHqSekgSPew5hYRhnneqCMPCOovXXpm_kAaHcv4cMHQ2_4lB0kvzST7Ud9UzaY50QtM9PtDgQo4kVj060MmYrDbHSj1gZG8vvK2V0XsjSrYu-ClIBAo0QMsIuezIY528-UoFW7EYaroJNyDD06frtf27hnnAf5_WcreZK60I23E2mj0-0AuYLyfTMAmsu_ADZmKlhdHAXBKLA"
+                src={profile?.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAubR8xt3BclBC3Z4GLCmxYyNxup3OrozKL-iqDeGoVSWOi6emkJ1ii1G8of_i8L4KHqSekgSPew5hYRhnneqCMPCOovXXpm_kAaHcv4cMHQ2_4lB0kvzST7Ud9UzaY50QtM9PtDgQo4kVj060MmYrDbHSj1gZG8vvK2V0XsjSrYu-ClIBAo0QMsIuezIY528-UoFW7EYaroJNyDD06frtf27hnnAf5_WcreZK60I23E2mj0-0AuYLyfTMAmsu_ADZmKlhdHAXBKLA'}
               />
             </div>
             <div>
@@ -44,27 +109,24 @@ const Settings = () => {
           <div className="space-y-5 flex-1">
             <div>
               <label className="block font-label text-[12px] font-semibold text-on-surface-variant mb-2 text-slate-500 text-xs uppercase">Display Name</label>
-              <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="text" defaultValue="Alex Mercer" />
+              <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
             </div>
             <div>
               <label className="block font-label text-[12px] font-semibold text-on-surface-variant mb-2 text-slate-500 text-xs uppercase">Email Address</label>
-              <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="email" defaultValue="alex.m@kinetic.io" />
+              <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200 disabled:opacity-70 disabled:cursor-not-allowed" type="email" value={user?.email || ''} readOnly disabled />
             </div>
             <div>
               <label className="block font-label text-[12px] font-semibold text-on-surface-variant mb-2 text-slate-500 text-xs uppercase">Primary Focus Area</label>
               <div className="relative">
-                <select className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow cursor-pointer border-slate-200">
-                  <option>UI/UX Design Mastery</option>
-                  <option>Frontend Architecture</option>
-                  <option>Creative Coding</option>
-                </select>
-                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="text" placeholder="e.g. UI/UX Design Mastery" value={primaryFocus} onChange={(e) => setPrimaryFocus(e.target.value)} />
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-surface-variant/50 flex justify-end">
-            <button className="bg-primary hover:bg-primary/90 text-on-primary font-label text-[14px] font-semibold px-6 py-3 rounded-lg transition-transform hover:scale-[0.98]">
-              Save Profile
+          <div className="mt-8 pt-6 border-t border-surface-variant/50 flex flex-col items-end gap-2">
+            {error && <p className="text-sm text-error self-start">{error}</p>}
+            {toast && <p className="text-sm text-primary font-semibold self-start">{toast}</p>}
+            <button onClick={save} disabled={saving} className="bg-primary hover:bg-primary/90 text-on-primary font-label text-[14px] font-semibold px-6 py-3 rounded-lg transition-transform hover:scale-[0.98] disabled:opacity-60">
+              {saving ? 'Saving…' : 'Save Profile'}
             </button>
           </div>
         </section>
@@ -83,7 +145,7 @@ const Settings = () => {
                 <p className="font-body text-[14px] text-on-surface-variant leading-relaxed text-sm text-slate-500">Automatically deduct progress hours if no activity is logged within the defined grace period.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-                <input defaultChecked className="sr-only peer" type="checkbox" value="" />
+                <input checked={inactivityPenalty} onChange={(e) => setInactivityPenalty(e.target.checked)} className="sr-only peer" type="checkbox" />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
@@ -94,10 +156,10 @@ const Settings = () => {
                 <span className="material-symbols-outlined text-[16px] text-primary" title="Time before penalty applies">info</span>
               </label>
               <div className="relative">
-                <select className="w-full bg-white border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow cursor-pointer font-medium border-slate-200" defaultValue="48 Hours (Standard)">
-                  <option>24 Hours (Aggressive)</option>
-                  <option>48 Hours (Standard)</option>
-                  <option>72 Hours (Lenient)</option>
+                <select className="w-full bg-white border border-outline-variant text-on-surface text-[16px] rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow cursor-pointer font-medium border-slate-200" value={gracePeriod} onChange={(e) => setGracePeriod(Number(e.target.value))}>
+                  {GRACE_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
                 </select>
                 <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">unfold_more</span>
               </div>
@@ -107,7 +169,7 @@ const Settings = () => {
               <label className="block font-label text-[12px] font-semibold text-on-surface-variant mb-2 text-xs text-slate-500 uppercase">Weekly Hour Target</label>
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[18px] font-bold rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="number" defaultValue="20" />
+                  <input className="w-full bg-slate-50 border border-outline-variant text-on-surface text-[18px] font-bold rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow border-slate-200" type="number" min="0" value={weeklyTarget} onChange={(e) => setWeeklyTarget(e.target.value)} />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-label text-[14px] text-slate-400">hrs</span>
                 </div>
                 <div className="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-lg font-label text-[12px] font-bold flex items-center gap-2 text-xs uppercase">
@@ -115,15 +177,11 @@ const Settings = () => {
                   On Track
                 </div>
               </div>
-              <div className="mt-4 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full w-[65%]"></div>
-              </div>
-              <p className="text-on-surface-variant text-[12px] mt-2 text-right text-xs text-slate-400">Current pace: 13/20 hrs</p>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-surface-variant/50 flex justify-end">
-            <button className="bg-white text-primary border border-primary hover:bg-primary/5 font-label text-[14px] font-semibold px-6 py-3 rounded-lg transition-colors text-sm">
-              Update Rules
+            <button onClick={save} disabled={saving} className="bg-white text-primary border border-primary hover:bg-primary/5 font-label text-[14px] font-semibold px-6 py-3 rounded-lg transition-colors text-sm disabled:opacity-60">
+              {saving ? 'Saving…' : 'Update Rules'}
             </button>
           </div>
         </section>

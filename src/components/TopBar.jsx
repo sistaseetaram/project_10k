@@ -1,6 +1,10 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const TopBar = () => {
+  const { user, signOut } = useAuth();
+  const email = user?.email || '';
+  const initial = (email[0] || '?').toUpperCase();
   return (
     <header className="bg-surface text-primary font-headline sticky top-0 z-40 border-b border-outline-variant flex justify-between items-center h-16 px-6 w-full shrink-0">
       <div className="flex items-center gap-4">
@@ -30,12 +34,20 @@ const TopBar = () => {
           </button>
         </div>
 
-        <div className="ml-2 pl-4 border-l border-outline-variant">
-          <img
-            alt="User profile"
-            className="w-8 h-8 rounded-full object-cover border border-outline-variant cursor-pointer hover:ring-2 hover:ring-primary-container transition-all"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeC_WMXptWFKSKiwDg71SU7oNfI7kKZii_Ci01irp154kEDOJLEU1WgZNs-ugIyrWJIB_AGNbvpfmPiU7W9osymqvAlgvvGZg3RqJyWJlnCWmIMviBcHfBulCpPviefJqbjTVmPgvUELS2P3amgeeOMDcMyDxO_1F73V4_LIJN8MDLCQJ9Ye8C7Bzn_jDxl9QVbhm37gHFzoA7Nrj6ogGiZ6zkvvqRahwHOtbuk4EawKfGIB9m7PZp23VBxUedUyHRnoPtPCT9EkM"
-          />
+        <div className="ml-2 pl-4 border-l border-outline-variant flex items-center gap-3">
+          <div
+            title={email}
+            className="grid w-8 h-8 place-items-center rounded-full bg-primary-container text-on-primary-container text-sm font-bold border border-outline-variant select-none"
+          >
+            {initial}
+          </div>
+          <button
+            onClick={signOut}
+            title="Sign out"
+            className="p-2 text-on-surface-variant hover:bg-surface-container-low hover:text-error transition-colors rounded-full active:scale-95 duration-150"
+          >
+            <span className="material-symbols-outlined">logout</span>
+          </button>
         </div>
       </div>
     </header>

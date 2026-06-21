@@ -1,6 +1,37 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { useDisciplines } from '../hooks/useDisciplines';
+import { useSessions } from '../hooks/useSessions';
+
+function fmt(n) {
+  return Math.round(n).toLocaleString();
+}
 
 const Archive = () => {
+  const { disciplines, loading: dLoading, setArchived } = useDisciplines({ includeArchived: true });
+  const { sessions, loading: sLoading } = useSessions();
+  const loading = dLoading || sLoading;
+
+  const [busyId, setBusyId] = useState(null);
+
+  const hoursById = useMemo(() => {
+    const map = {};
+    for (const s of sessions) {
+      map[s.discipline_id] = (map[s.discipline_id] || 0) + Number(s.duration_hours || 0);
+    }
+    return map;
+  }, [sessions]);
+
+  const archived = disciplines.filter((d) => d.archived === true);
+
+  const restore = async (id) => {
+    setBusyId(id);
+    try {
+      await setArchived(id, false);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="max-w-[1200px] mx-auto w-full pb-10">
       {/* Page Header */}
@@ -11,143 +42,73 @@ const Archive = () => {
         </p>
       </header>
 
-      {/* Archived Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
-        {/* Card 1: Penalty Reset */}
-        <article className="bg-white border border-surface-variant rounded-xl p-[32px] flex flex-col hover:bg-surface-bright transition-colors duration-300 relative overflow-hidden group shadow-sm border-slate-200">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-error/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-          <div className="flex justify-between items-start mb-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-[24px]">architecture</span>
-              </div>
-              <div>
-                <h3 className="text-[24px] font-[600] leading-[1.3] font-headline text-on-surface text-xl">Frontend Architecture</h3>
-                <p className="font-body text-[14px] text-on-surface-variant text-slate-400 text-sm">Started Oct 2022</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-error-container text-on-error-container font-label font-[600] text-[12px] uppercase tracking-[0.05em] text-xs">
-              Penalty Reset
-            </span>
-          </div>
-          <div className="mb-8 relative z-10 flex-1">
-            <div className="flex justify-between font-label font-[600] text-[14px] text-on-surface mb-2 uppercase tracking-[0.05em] text-xs">
-              <span>Hours Logged</span>
-              <span>420 / 10k</span>
-            </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-surface-variant w-[4.2%] rounded-full bg-slate-300"></div>
-            </div>
-            <p className="mt-4 font-body text-[14px] text-on-surface-variant leading-relaxed text-sm text-slate-500">
-              Archived due to excessive consecutive missed days. The discipline requires consistent momentum. Reset recommended to rebuild foundational habits.
-            </p>
-          </div>
-          <div className="flex gap-4 mt-auto relative z-10">
-            <button className="flex-1 bg-slate-50 border border-outline-variant hover:border-primary hover:text-primary text-on-surface font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 border-slate-200 text-sm">
-              <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-              Restart Zero
-            </button>
-            <button className="flex-1 bg-transparent border border-outline-variant hover:bg-slate-50 text-on-surface font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 border-slate-200 text-sm">
-              <span className="material-symbols-outlined text-[18px]">visibility</span>
-              View Logs
-            </button>
-          </div>
-        </article>
-
-        {/* Card 2: Paused */}
-        <article className="bg-white border border-surface-variant rounded-xl p-[32px] flex flex-col hover:bg-surface-bright transition-colors duration-300 relative overflow-hidden group shadow-sm border-slate-200">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-          <div className="flex justify-between items-start mb-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant">
-                <span className="material-symbols-outlined text-[24px]">piano</span>
-              </div>
-              <div>
-                <h3 className="text-[24px] font-[600] leading-[1.3] font-headline text-on-surface text-xl">Classical Piano</h3>
-                <p className="font-body text-[14px] text-on-surface-variant text-slate-400 text-sm">Started Jan 2021</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-on-surface-variant font-label font-[600] text-[12px] uppercase tracking-[0.05em] text-xs">
-              Goal Shift
-            </span>
-          </div>
-          <div className="mb-8 relative z-10 flex-1">
-            <div className="flex justify-between font-label font-[600] text-[14px] text-on-surface mb-2 uppercase tracking-[0.05em] text-xs">
-              <span>Hours Logged</span>
-              <span>1,250 / 10k</span>
-            </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-surface-variant w-[12.5%] rounded-full bg-slate-300"></div>
-            </div>
-            <p className="mt-4 font-body text-[14px] text-on-surface-variant leading-relaxed text-sm text-slate-500">
-              Intentionally paused to allocate focus bandwidth to primary career objectives. Foundation is solid; ready to be resumed when capacity allows.
-            </p>
-          </div>
-          <div className="flex gap-4 mt-auto relative z-10">
-            <button className="flex-1 bg-primary hover:opacity-90 text-on-primary font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
-              <span className="material-symbols-outlined text-[18px]">play_arrow</span>
-              Resume
-            </button>
-            <button className="flex-1 bg-transparent border border-outline-variant hover:bg-slate-50 text-on-surface font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 border-slate-200 text-sm">
-              <span className="material-symbols-outlined text-[18px]">visibility</span>
-              View Logs
-            </button>
-          </div>
-        </article>
-
-        {/* Card 3: Completed / Evolved */}
-        <article className="bg-white border border-surface-variant rounded-xl p-[32px] flex flex-col hover:bg-surface-bright transition-colors duration-300 relative overflow-hidden group lg:col-span-2 shadow-sm border-slate-200">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-tertiary/5 rounded-bl-full -mr-32 -mt-32 transition-transform group-hover:scale-105"></div>
-          <div className="flex flex-col md:flex-row gap-8 relative z-10">
-            <div className="flex-1">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[24px]">memory</span>
+      {loading ? (
+        <div className="animate-pulse grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
+          <div className="h-64 rounded-xl bg-surface-container-high" />
+          <div className="h-64 rounded-xl bg-surface-container-high" />
+        </div>
+      ) : archived.length === 0 ? (
+        <div className="bg-white border border-surface-variant rounded-xl p-16 text-center shadow-sm border-slate-200">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant text-slate-300 mb-4">inventory_2</span>
+          <h3 className="text-2xl font-bold text-on-surface mb-2 font-headline">No archived journeys.</h3>
+          <p className="text-on-surface-variant text-slate-500">Disciplines you archive will appear here, ready to be restored.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
+          {archived.map((d) => {
+            const hours = hoursById[d.id] || 0;
+            const target = d.target_hours || 10000;
+            const pct = target ? (hours / target) * 100 : 0;
+            return (
+              <article key={d.id} className="bg-white border border-surface-variant rounded-xl p-[32px] flex flex-col hover:bg-surface-bright transition-colors duration-300 relative overflow-hidden group shadow-sm border-slate-200">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+                <div className="flex justify-between items-start mb-6 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-[24px]">{d.icon || 'inventory_2'}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-[24px] font-[600] leading-[1.3] font-headline text-on-surface text-xl">{d.name}</h3>
+                      <p className="font-body text-[14px] text-on-surface-variant text-slate-400 text-sm">{d.category || 'Archived'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-[24px] font-[600] leading-[1.3] font-headline text-on-surface text-xl">Machine Learning</h3>
-                    <p className="font-body text-[14px] text-on-surface-variant text-slate-400 text-sm">Started Mar 2020</p>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-on-surface-variant font-label font-[600] text-[12px] uppercase tracking-[0.05em] text-xs">
+                    Archived
+                  </span>
+                </div>
+                <div className="mb-8 relative z-10 flex-1">
+                  <div className="flex justify-between font-label font-[600] text-[14px] text-on-surface mb-2 uppercase tracking-[0.05em] text-xs">
+                    <span>Hours Logged</span>
+                    <span>{fmt(hours)} / 10k</span>
                   </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-surface-variant rounded-full bg-slate-300" style={{ width: `${Math.max(pct, 0.5)}%` }}></div>
+                  </div>
+                  {d.focus && (
+                    <p className="mt-4 font-body text-[14px] text-on-surface-variant leading-relaxed text-sm text-slate-500">
+                      Focus: {d.focus}
+                    </p>
+                  )}
                 </div>
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label font-[600] text-[12px] uppercase tracking-[0.05em] text-xs">
-                  Evolved
-                </span>
-              </div>
-              <p className="font-body text-[16px] text-on-surface-variant leading-relaxed max-w-lg mb-6 text-sm text-slate-500">
-                Journey naturally evolved into practical application rather than pure study. The foundational 3,000 hours established the necessary competence for current project integration.
-              </p>
-              <div className="flex gap-4">
-                <button className="bg-slate-50 border border-outline-variant hover:border-primary hover:text-primary text-on-surface font-label font-[600] text-[14px] py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border-slate-200 text-sm">
-                  <span className="material-symbols-outlined text-[18px]">unarchive</span>
-                  Reactivate
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 md:border-l md:border-surface-variant md:pl-8 flex flex-col justify-center">
-              <div className="mb-4">
-                <div className="flex justify-between font-label font-[600] text-[14px] text-on-surface mb-2 uppercase tracking-[0.05em] text-xs">
-                  <span>Hours Logged</span>
-                  <span>3,450 / 10k</span>
+                <div className="flex gap-4 mt-auto relative z-10">
+                  <button
+                    onClick={() => restore(d.id)}
+                    disabled={busyId === d.id}
+                    className="flex-1 bg-primary hover:opacity-90 text-on-primary font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-60"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">unarchive</span>
+                    {busyId === d.id ? 'Restoring…' : 'Restore'}
+                  </button>
+                  <button className="flex-1 bg-transparent border border-outline-variant hover:bg-slate-50 text-on-surface font-label font-[600] text-[14px] py-3 rounded-lg transition-all flex items-center justify-center gap-2 border-slate-200 text-sm">
+                    <span className="material-symbols-outlined text-[18px]">visibility</span>
+                    View Logs
+                  </button>
                 </div>
-                <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-tertiary w-[34.5%] rounded-full"></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="font-label text-[12px] text-on-surface-variant uppercase tracking-[0.05em] mb-1 text-xs text-slate-400">Consistency</p>
-                  <p className="font-display text-[24px] font-bold text-on-surface text-xl">82%</p>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="font-label text-[12px] text-on-surface-variant uppercase tracking-[0.05em] mb-1 text-xs text-slate-400">Deep Work</p>
-                  <p className="font-display text-[24px] font-bold text-on-surface text-xl">2.1k<span className="text-[14px] font-body font-normal text-on-surface-variant ml-1 text-sm">hrs</span></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

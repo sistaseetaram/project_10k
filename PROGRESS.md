@@ -1,3 +1,16 @@
+# Project 10K — Handoff
+
+## Multi-user (2026-06-20) — CODE COMPLETE, awaiting Supabase keys
+- Stack added: Supabase (auth + Postgres + RLS), `@supabase/supabase-js`. Client-side, stays on GitHub Pages.
+- Repo moved to `~/Desktop/Claude/claude_projects/project_10k`.
+- Auth: email/password + Google. Landing CTA → AuthScreen → app (gated on session).
+- New: `src/lib/supabaseClient.js`, `src/context/AuthContext.jsx`, `src/components/AuthScreen.jsx`, `src/hooks/{useProfile,useDisciplines,useSessions,useMetrics}.js`, `supabase/schema.sql`.
+- All 7 pages wired to per-user data; every metric computed from `sessions` (single source of truth). Hardcoded "Alex Mercer" etc. gone.
+- **TO GO LIVE:** follow `SUPABASE_SETUP.md` (create project, paste keys into `.env`, run `schema.sql`, set redirect URLs). Then rebuild + redeploy. Until keys exist, auth screen shows "backend not configured" — so the auth build is NOT deployed yet (current live site = pre-auth hero/landing).
+- Hero video now Brian (ElevenLabs) at 1.2x, 18s, deployed.
+
+---
+
 # Project 10K — Handoff (2026-06-16)
 
 ## Live site
